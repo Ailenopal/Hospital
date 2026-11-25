@@ -1,0 +1,43 @@
+{# Standalone sign-in page (split screen with the system flow). Fed by accounts.views.HospitalLoginView. #}
+{% load static %}<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in | {{ hospital.hospital_name }}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="{% static 'css/main.css' %}" rel="stylesheet">
+</head><body>
+<div class="login-shell">
+  <section class="login-art">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <span class="brand-logo" style="background:rgba(255,255,255,.2)"><i class="bi bi-heart-pulse-fill"></i></span>
+      <div><div class="fw-bold fs-5">{{ hospital.hospital_name }}</div><div class="small opacity-75">{{ hospital.tagline }}</div></div>
+    </div>
+    <h2 class="fw-bold mb-3" style="max-width:420px">One secure place for patient records.</h2>
+    <div class="flow" style="max-width:380px">
+      <div class="flow-step"><i class="bi bi-shield-check"></i> <strong>Super Admin</strong><small>Full system access</small></div>
+      <div class="flow-arrow"><i class="bi bi-arrow-down"></i></div>
+      <div class="flow-step"><strong>Creates and manages Admin accounts</strong></div>
+      <div class="flow-arrow"><i class="bi bi-arrow-down"></i></div>
+      <div class="flow-step"><i class="bi bi-people"></i> <strong>Admin</strong><small>Patient management access</small></div>
+      <div class="flow-arrow"><i class="bi bi-arrow-down"></i></div>
+      <div class="flow-step"><strong>Patient registration</strong><small>Register &middot; Edit &middot; View &middot; Search &middot; Manage</small></div>
+      <div class="flow-arrow"><i class="bi bi-arrow-down"></i></div>
+      <div class="flow-step"><i class="bi bi-database"></i> <strong>Hospital database</strong><small>Securely stores patient and hospital records</small></div>
+    </div>
+  </section>
+  <section class="login-form-wrap">
+    <form class="login-form" method="post" novalidate>
+      {% csrf_token %}
+      <h1 class="h3 fw-bold mb-1">Sign in</h1>
+      <p class="text-muted mb-4">Use the account issued by your hospital administrator.</p>
+      {% if form.non_field_errors %}<div class="alert alert-danger py-2"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ form.non_field_errors.0 }}</div>{% endif %}
+      {% include "partials/_messages.html" %}
+      <div class="mb-3"><label class="form-label" for="{{ form.username.id_for_label }}">Username</label>{{ form.username }}</div>
+      <div class="mb-3"><label class="form-label" for="{{ form.password.id_for_label }}">Password</label>{{ form.password }}</div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+    </form>
+  </section>
+</div>
+</body></html>

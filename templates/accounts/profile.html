@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{# My profile page. Fed by accounts.views.profile. #}
+{% block title %}My profile{% endblock %}
+{% block page_title %}My profile{% endblock %}
+{% block page_actions %}<a class="btn btn-outline-primary" href="{% url 'accounts:password_change' %}"><i class="bi bi-key me-1"></i>Change password</a>{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4"><div class="card text-center"><div class="card-body py-4">
+    <span class="avatar avatar-lg mb-3">{{ user.initials }}</span>
+    <h2 class="h5 mb-0">{{ user.display_name }}</h2>
+    <div class="text-muted small mb-2">@{{ user.username }}</div>
+    <span class="badge {% if user.is_super_admin %}text-bg-primary{% else %}bg-teal-soft text-teal{% endif %}">{{ user.get_role_display }}</span>
+  </div></div></div>
+  <div class="col-lg-8"><div class="card"><div class="card-header">Personal details</div><div class="card-body">
+    <form method="post" novalidate>{% csrf_token %}<div class="row g-3">
+      {% include "partials/_field.html" with field=form.first_name %}
+      {% include "partials/_field.html" with field=form.last_name %}
+      {% include "partials/_field.html" with field=form.email %}
+      {% include "partials/_field.html" with field=form.phone %}
+      <div class="col-12"><button class="btn btn-primary" type="submit">Save profile</button></div>
+    </div></form>
+  </div></div></div>
+</div>
+{% endblock %}

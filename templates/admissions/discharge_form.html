@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{# Discharge form. Fed by admissions.views.admission_discharge. #}
+{% block title %}Discharge patient{% endblock %}
+{% block page_title %}Discharge {{ admission.patient.full_name }}{% endblock %}
+{% block page_actions %}<a class="btn btn-light" href="{% url 'admissions:list' %}"><i class="bi bi-arrow-left me-1"></i>Back</a>{% endblock %}
+{% block content %}
+<div class="row g-3"><div class="col-lg-4"><div class="card"><div class="card-header">Admission summary</div><div class="card-body"><dl class="detail-list mb-0">
+  <dt>Patient</dt><dd>{{ admission.patient.full_name }} ({{ admission.patient.patient_id }})</dd>
+  <dt>Admitted</dt><dd>{{ admission.admission_date|date:"M d, Y h:i A" }}</dd>
+  <dt>Ward / room</dt><dd>{{ admission.ward }}{% if admission.room_number %} / {{ admission.room_number }}{% endif %}</dd>
+  <dt>Physician</dt><dd>{{ admission.attending_physician }}</dd>
+  <dt>Reason</dt><dd>{{ admission.reason }}</dd></dl></div></div></div>
+<div class="col-lg-8"><form method="post" novalidate>{% csrf_token %}<div class="card"><div class="card-body"><div class="row g-3">
+  {% include "partials/_field.html" with field=form.discharge_date col="col-md-6" %}
+  {% include "partials/_field.html" with field=form.discharge_notes col="col-12" %}
+  <div class="col-12 d-flex gap-2"><button class="btn btn-teal" type="submit"><i class="bi bi-door-open me-1"></i>Confirm discharge</button><a class="btn btn-light" href="{% url 'admissions:list' %}">Cancel</a></div>
+</div></div></div></form></div></div>
+{% endblock %}

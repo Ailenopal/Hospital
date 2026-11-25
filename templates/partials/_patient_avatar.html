@@ -1,0 +1,2 @@
+{# Patient photo, or initials when there is no photo. Needs p (patient) and size. #}
+{% if p.profile_picture %}<img class="avatar {{ size }}" src="{{ p.profile_picture.url }}" alt="{{ p.full_name }}">{% else %}<span class="avatar {{ size }}">{{ p.initials }}</span>{% endif %}

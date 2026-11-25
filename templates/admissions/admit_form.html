@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{# Admit patient form. Fed by admissions.views.admission_create. #}
+{% block title %}Admit patient{% endblock %}
+{% block page_title %}Admit patient{% endblock %}
+{% block page_actions %}<a class="btn btn-light" href="{% url 'admissions:list' %}"><i class="bi bi-arrow-left me-1"></i>Back</a>{% endblock %}
+{% block content %}
+<form method="post" novalidate>{% csrf_token %}
+<div class="card" style="max-width:860px"><div class="card-body"><div class="row g-3">
+  {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger mb-0">{{ form.non_field_errors.0 }}</div></div>{% endif %}
+  {% include "partials/_field.html" with field=form.patient %}
+  {% include "partials/_field.html" with field=form.admission_date %}
+  {% include "partials/_field.html" with field=form.ward %}
+  {% include "partials/_field.html" with field=form.room_number %}
+  {% include "partials/_field.html" with field=form.attending_physician col="col-12" %}
+  {% include "partials/_field.html" with field=form.reason col="col-12" %}
+  <div class="col-12 d-flex gap-2"><button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle me-1"></i>Admit patient</button><a class="btn btn-light" href="{% url 'admissions:list' %}">Cancel</a></div>
+</div></div></div>
+</form>
+{% endblock %}

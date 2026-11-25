@@ -1,0 +1,5 @@
+Django>=5.0,<5.3
+Pillow>=10.0
+PyMySQL>=1.1          # MySQL / MySQL Workbench (used when DB_ENGINE=mysql)
+cryptography>=42      # needed by PyMySQL for MySQL 8 password auth
+# psycopg2-binary>=2.9   # only for DB_ENGINE=postgres

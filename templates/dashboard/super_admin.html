@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{# SUPER ADMIN DASHBOARD: stat cards, charts, recent patients, admins, flow diagram, activities. Fed by dashboard.views.super_admin_dashboard. #}
+{% block title %}Super Admin dashboard{% endblock %}
+{% block page_title %}Welcome back, {{ user.first_name|default:user.username }}{% endblock %}
+{% block page_subtitle %}<div class="text-muted small">System-wide overview of the hospital.</div>{% endblock %}
+{% block page_actions %}
+  <a class="btn btn-teal" href="{% url 'patients:create' %}"><i class="bi bi-person-plus me-1"></i>Quick patient registration</a>
+  <a class="btn btn-primary" href="{% url 'accounts:admin_create' %}"><i class="bi bi-person-gear me-1"></i>New Admin</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-sm-6 col-xl-3">{% include "partials/_stat_card.html" with label="Registered patients" value=stats.total icon="people-fill" color="blue" url="/patients/" %}</div>
+  <div class="col-sm-6 col-xl-3">{% include "partials/_stat_card.html" with label="Admitted patients" value=stats.admitted icon="hospital-fill" color="amber" url="/admissions/" %}</div>
+  <div class="col-sm-6 col-xl-3">{% include "partials/_stat_card.html" with label="Discharged patients" value=stats.discharged icon="door-open-fill" color="teal" %}</div>
+  <div class="col-sm-6 col-xl-3">{% include "partials/_stat_card.html" with label="Administrators" value=stats.admins icon="person-gear" color="slate" url="/accounts/administrators/" %}</div>
+</div>
+<div class="row g-3 mb-3">
+  <div class="col-sm-6 col-xl-3">{% include "partials/_stat_card.html" with label="Registered today" value=stats.today icon="calendar-plus" color="teal" %}</div>
+  <div class="col-sm-6 col-xl-3">{% include "partials/_stat_card.html" with label="Active patients" value=stats.active icon="person-check" color="blue" %}</div>
+  <div class="col-sm-6 col-xl-3">{% include "partials/_stat_card.html" with label="Deactivated admins" value=stats.admins_inactive icon="person-slash" color="slate" %}</div>
+  <div class="col-sm-6 col-xl-3">{% include "partials/_stat_card.html" with label="Activities today" value=stats.activities_today icon="activity" color="amber" url="/reports/activity-logs/" %}</div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-8"><div class="card h-100"><div class="card-header">Patient registrations, last 6 months</div><div class="card-body"><canvas id="monthlyChart" height="110"></canvas></div></div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-header">Patients by gender</div><div class="card-body d-flex align-items-center justify-content-center"><canvas id="genderChart" style="max-height:240px"></canvas></div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-xl-8">
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">Recent patient registrations <a class="small fw-normal" href="{% url 'patients:list' %}">View all</a></div>
+      <div class="table-responsive"><table class="table table-hover mb-0">
+        <thead><tr><th>Patient</th><th>ID</th><th>Registered by</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody>{% for p in recent_patients %}
+          <tr><td><a class="text-decoration-none fw-semibold" href="{% url 'patients:detail' p.pk %}">{{ p.full_name }}</a></td><td>{{ p.patient_id }}</td>
+              <td>{{ p.registered_by.username|default:"-" }}</td><td class="small text-muted">{{ p.registered_at|date:"M d, Y" }}</td>
+              <td><span class="badge text-bg-{{ p.status_class }}">{{ p.get_status_display }}</span></td></tr>
+        {% empty %}<tr><td colspan="5"><div class="empty-state">No patients registered yet.</div></td></tr>{% endfor %}</tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">Newest Admin accounts <a class="small fw-normal" href="{% url 'accounts:admin_list' %}">Manage</a></div>
+      <ul class="list-group list-group-flush">{% for a in recent_admins %}
+        <li class="list-group-item d-flex align-items-center gap-2"><span class="avatar avatar-sm">{{ a.initials }}</span><div class="flex-grow-1"><div class="fw-semibold small">{{ a.display_name }}</div><div class="text-muted small">@{{ a.username }}</div></div>
+          <span class="badge {% if a.is_active %}text-bg-success{% else %}text-bg-secondary{% endif %}">{% if a.is_active %}Active{% else %}Deactivated{% endif %}</span></li>
+      {% empty %}<li class="list-group-item"><div class="empty-state py-3">No Admin accounts yet. Create one to get started.</div></li>{% endfor %}</ul>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card mb-3"><div class="card-header">How the system works</div><div class="card-body">
+      <div class="flow">
+        <div class="flow-step blue"><i class="bi bi-shield-check text-primary"></i> <strong>Super Admin</strong><small>Full system access</small></div>
+        <div class="flow-arrow"><i class="bi bi-arrow-down"></i></div>
+        <div class="flow-step"><strong>Creates and manages Admin accounts</strong></div>
+        <div class="flow-arrow"><i class="bi bi-arrow-down"></i></div>
+        <div class="flow-step teal"><i class="bi bi-people text-teal"></i> <strong>Admin</strong><small>Patient management access</small></div>
+        <div class="flow-arrow"><i class="bi bi-arrow-down"></i></div>
+        <div class="flow-step"><strong>Patient registration</strong><small>Register &middot; Edit &middot; View &middot; Search &middot; Manage</small></div>
+        <div class="flow-arrow"><i class="bi bi-arrow-down"></i></div>
+        <div class="flow-step blue"><i class="bi bi-database text-primary"></i> <strong>Hospital database</strong><small>Securely stores patient and hospital records</small></div>
+      </div></div></div>
+    <div class="card"><div class="card-header d-flex justify-content-between align-items-center">Recent activities <a class="small fw-normal" href="{% url 'reports:activity_logs' %}">All logs</a></div>
+      <div class="card-body py-1">{% include "partials/_activity_list.html" with logs=recent_activities show_user=True %}</div></div>
+  </div>
+</div>
+{{ charts|json_script:"chart-data" }}
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+const c = JSON.parse(document.getElementById("chart-data").textContent);
+new Chart(document.getElementById("monthlyChart"), {type: "bar",
+  data: {labels: c.monthly.labels, datasets: [{label: "Registrations", data: c.monthly.values, backgroundColor: "#1565c0", borderRadius: 6}]},
+  options: {plugins: {legend: {display: false}}, scales: {y: {beginAtZero: true, ticks: {precision: 0}}}}});
+new Chart(document.getElementById("genderChart"), {type: "doughnut",
+  data: {labels: c.gender.labels, datasets: [{data: c.gender.values, backgroundColor: ["#1565c0", "#00897b", "#90a4ae"]}]},
+  options: {plugins: {legend: {position: "bottom"}}, cutout: "62%"}});
+</script>
+{% endblock %}

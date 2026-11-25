@@ -1,0 +1,12 @@
+{# List of audit-log entries (dashboards). Needs logs; optional show_user=True. #}
+{% for log in logs %}
+  <div class="activity-item">
+    <span class="activity-icon bg-{{ log.color }}-subtle text-{{ log.color }}"><i class="bi bi-{{ log.icon }}"></i></span>
+    <div class="small flex-grow-1">
+      <div>{{ log.description }}</div>
+      <div class="text-muted">{% if show_user and log.user %}{{ log.user.username }} &middot; {% endif %}{{ log.created_at|timesince }} ago</div>
+    </div>
+  </div>
+{% empty %}
+  <div class="empty-state"><i class="bi bi-activity"></i>No activity recorded yet.</div>
+{% endfor %}

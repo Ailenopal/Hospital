@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{# Administrators table. Fed by accounts.views.admin_list. #}
+{% block title %}Administrators{% endblock %}
+{% block page_title %}Administrators{% endblock %}
+{% block page_subtitle %}<div class="text-muted small">Create and manage the people who register and manage patients.</div>{% endblock %}
+{% block page_actions %}<a class="btn btn-primary" href="{% url 'accounts:admin_create' %}"><i class="bi bi-person-plus me-1"></i>New Admin account</a>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body border-bottom">
+    <form class="row g-2" method="get">
+      <div class="col-md-6"><input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search by name, username or email"></div>
+      <div class="col-md-3"><select class="form-select" name="status">
+        <option value="">All statuses</option>
+        <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Deactivated</option></select></div>
+      <div class="col-md-3 d-flex gap-2"><button class="btn btn-primary flex-fill">Filter</button><a class="btn btn-light" href="{% url 'accounts:admin_list' %}">Reset</a></div>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Permissions</th><th>Last sign-in</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+      <tbody>
+      {% for u in page_obj %}
+        <tr>
+          <td><div class="d-flex align-items-center gap-2"><span class="avatar avatar-sm">{{ u.initials }}</span><div><div class="fw-semibold">{{ u.display_name }}</div><div class="small text-muted">{{ u.email }}</div></div></div></td>
+          <td>{{ u.username }}</td>
+          <td><span class="badge {% if u.is_super_admin %}text-bg-primary{% else %}bg-teal-soft text-teal{% endif %}">{{ u.get_role_display }}</span></td>
+          <td class="small">{% if u.is_super_admin %}<span class="text-muted">Full access</span>{% else %}
+            <span class="badge text-bg-light border {% if not u.can_archive_patients %}text-decoration-line-through text-muted{% endif %}">Archive</span>
+            <span class="badge text-bg-light border {% if not u.can_manage_admissions %}text-decoration-line-through text-muted{% endif %}">Admissions</span>{% endif %}</td>
+          <td class="small text-muted">{% if u.last_login %}{{ u.last_login|date:"M d, Y h:i A" }}{% else %}Never{% endif %}</td>
+          <td><span class="badge {% if u.is_active %}text-bg-success{% else %}text-bg-secondary{% endif %}">{% if u.is_active %}Active{% else %}Deactivated{% endif %}</span></td>
+          <td class="text-end table-actions">
+            {% if u.is_hospital_admin %}
+            <a class="btn btn-outline-primary" href="{% url 'accounts:admin_update' u.pk %}" title="Edit"><i class="bi bi-pencil"></i></a>
+            <a class="btn btn-outline-secondary" href="{% url 'accounts:admin_reset_password' u.pk %}" title="Reset password"><i class="bi bi-key"></i></a>
+            <form class="d-inline" method="post" action="{% url 'accounts:admin_toggle' u.pk %}"
+                  data-confirm="{% if u.is_active %}{{ u.display_name }} will no longer be able to sign in.{% else %}{{ u.display_name }} will be able to sign in again.{% endif %}"
+                  data-confirm-title="{% if u.is_active %}Deactivate account?{% else %}Activate account?{% endif %}"
+                  data-confirm-btn="{% if u.is_active %}Deactivate{% else %}Activate{% endif %}"
+                  data-confirm-class="{% if u.is_active %}btn-danger{% else %}btn-teal{% endif %}">
+              {% csrf_token %}<button class="btn {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" title="{% if u.is_active %}Deactivate{% else %}Activate{% endif %}"><i class="bi bi-{% if u.is_active %}person-slash{% else %}person-check{% endif %}"></i></button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7"><div class="empty-state"><i class="bi bi-person-x"></i>No accounts match your filters.</div></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <span class="small text-muted">{{ page_obj.paginator.count }} account{{ page_obj.paginator.count|pluralize }}</span>
+    {% include "partials/_pagination.html" %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{# LEFT MENU. Add or remove menu links here. Super Admin links are inside the "user.is_super_admin" block. #}
+{% with ns=request.resolver_match.namespace name=request.resolver_match.url_name %}
+<aside class="sidebar" aria-label="Main navigation">
+  <a class="brand" href="{% url 'dashboard:home' %}">
+    <span class="brand-logo"><i class="bi bi-heart-pulse-fill"></i></span>
+    <span><span class="brand-name d-block">{{ hospital.hospital_name }}</span><span class="brand-sub">Hospital Management System</span></span>
+  </a>
+  <nav class="sidebar-nav nav flex-column">
+    <a class="nav-link {% if ns == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:home' %}"><i class="bi bi-grid-1x2-fill"></i>Dashboard</a>
+
+    <div class="nav-heading">Patients</div>
+    <a class="nav-link {% if ns == 'patients' and name != 'create' %}active{% endif %}" href="{% url 'patients:list' %}"><i class="bi bi-people-fill"></i>All patients</a>
+    <a class="nav-link {% if ns == 'patients' and name == 'create' %}active{% endif %}" href="{% url 'patients:create' %}"><i class="bi bi-person-plus-fill"></i>Register patient</a>
+    <a class="nav-link {% if ns == 'admissions' %}active{% endif %}" href="{% url 'admissions:list' %}"><i class="bi bi-hospital-fill"></i>Admissions</a>
+
+    <div class="nav-heading">Insights</div>
+    <a class="nav-link {% if ns == 'reports' and name != 'activity_logs' %}active{% endif %}" href="{% url 'reports:overview' %}"><i class="bi bi-bar-chart-line-fill"></i>Reports</a>
+
+    {% if user.is_super_admin %}
+    <div class="nav-heading">Super Admin</div>
+    <a class="nav-link {% if ns == 'accounts' and name != 'profile' and name != 'password_change' %}active{% endif %}" href="{% url 'accounts:admin_list' %}"><i class="bi bi-person-gear"></i>Administrators</a>
+    <a class="nav-link {% if name == 'activity_logs' %}active{% endif %}" href="{% url 'reports:activity_logs' %}"><i class="bi bi-journal-text"></i>Activity logs</a>
+    <a class="nav-link {% if ns == 'core' %}active{% endif %}" href="{% url 'core:settings' %}"><i class="bi bi-gear-fill"></i>System settings</a>
+    {% endif %}
+  </nav>
+  <div class="sidebar-foot">Signed in as <strong>{{ user.get_role_display }}</strong></div>
+</aside>
+{% endwith %}

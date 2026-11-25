@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{# System settings form. Fed by core.views.system_settings. #}
+{% block title %}System settings{% endblock %}
+{% block page_title %}System settings{% endblock %}
+{% block page_subtitle %}<div class="text-muted small">Only the Super Admin can change these.</div>{% endblock %}
+{% block content %}
+<form method="post" novalidate>{% csrf_token %}
+<div class="card" style="max-width:820px"><div class="card-body"><div class="row g-3">
+  {% include "partials/_field.html" with field=form.hospital_name %}
+  {% include "partials/_field.html" with field=form.tagline %}
+  {% include "partials/_field.html" with field=form.address col="col-12" %}
+  {% include "partials/_field.html" with field=form.phone %}
+  {% include "partials/_field.html" with field=form.email %}
+  {% include "partials/_field.html" with field=form.registration_prefix %}
+  {% include "partials/_field.html" with field=form.records_per_page %}
+  <div class="col-12"><button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle me-1"></i>Save settings</button></div>
+</div></div></div>
+</form>
+{% endblock %}

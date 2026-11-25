@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{# Create / edit Admin account (one template, is_create switches). Fed by admin_create and admin_update. #}
+{% block title %}{% if is_create %}New Admin account{% else %}Edit Admin account{% endif %}{% endblock %}
+{% block page_title %}{% if is_create %}New Admin account{% else %}Edit {{ target.username }}{% endif %}{% endblock %}
+{% block page_actions %}<a class="btn btn-light" href="{% url 'accounts:admin_list' %}"><i class="bi bi-arrow-left me-1"></i>Back</a>{% endblock %}
+{% block content %}
+<form method="post" novalidate>{% csrf_token %}
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card mb-3"><div class="card-header section-title"><i class="bi bi-person-badge"></i>Account details</div>
+        <div class="card-body"><div class="row g-3">
+          {% if is_create %}{% include "partials/_field.html" with field=form.username col="col-12" %}{% endif %}
+          {% include "partials/_field.html" with field=form.first_name %}
+          {% include "partials/_field.html" with field=form.last_name %}
+          {% include "partials/_field.html" with field=form.email %}
+          {% include "partials/_field.html" with field=form.phone %}
+          {% if is_create %}
+            {% include "partials/_field.html" with field=form.password1 %}
+            {% include "partials/_field.html" with field=form.password2 %}
+          {% endif %}
+        </div></div></div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card mb-3"><div class="card-header section-title"><i class="bi bi-shield-lock"></i>Permissions</div>
+        <div class="card-body d-grid gap-3">
+          <p class="small text-muted mb-0">Every Admin can register, view, edit and search patients. Grant extra abilities here.</p>
+          {% include "partials/_checkbox.html" with field=form.can_archive_patients %}
+          {% include "partials/_checkbox.html" with field=form.can_manage_admissions %}
+          {% if not is_create %}{% include "partials/_checkbox.html" with field=form.is_active %}{% endif %}
+        </div></div>
+      <button class="btn btn-primary w-100" type="submit"><i class="bi bi-check2-circle me-1"></i>{% if is_create %}Create Admin account{% else %}Save changes{% endif %}</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

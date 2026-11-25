@@ -1,0 +1,16 @@
+{# Pop-up confirmation. Any <form data-confirm="..."> opens it (logic in static/js/main.js). #}
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title" data-confirm-title>Please confirm</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-muted" data-confirm-text></div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" data-confirm-ok>Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
